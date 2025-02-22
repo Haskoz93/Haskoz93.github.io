@@ -1,90 +1,96 @@
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Scanner;
-
-class Equipo {
-    String nombre;
-    int derrotas = 0;
-
-    Equipo(String nombre) {
-        this.nombre = nombre;
-    }
-}
-
-public class TorneoDobleEliminacionManual {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        List<Equipo> equipos = new ArrayList<>();
-        equipos.add(new Equipo("Iago"));
-        equipos.add(new Equipo("Kevin"));
-        equipos.add(new Equipo("Nahi"));
-        equipos.add(new Equipo("Gaby"));
-        equipos.add(new Equipo("Dani"));
-        equipos.add(new Equipo("Alex"));
-
-        List<Equipo> ganadores = new ArrayList<>(equipos);
-        List<Equipo> perdedores = new ArrayList<>();
-
-        System.out.println("Inicio del Torneo de Doble Eliminación\n");
-
-        while (ganadores.size() > 1 || perdedores.size() > 1) {
-            jugarRonda(ganadores, perdedores, scanner, "Bracket de Ganadores");
-            if (!perdedores.isEmpty()) {
-                jugarRonda(perdedores, new ArrayList<>(), scanner, "Bracket de Perdedores");
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Torneo Doble Eliminación</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { text-align: center; }
+        .match { margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Torneo de Doble Eliminación</h1>
+    <div id="output"></div>
+    <script>
+        class Equipo {
+            constructor(nombre) {
+                this.nombre = nombre;
+                this.derrotas = 0;
             }
         }
 
-        // Gran final
-        Equipo finalistaGanadores = ganadores.get(0);
-        Equipo finalistaPerdedores = perdedores.get(0);
-        Equipo campeon = jugarGranFinal(finalistaGanadores, finalistaPerdedores, scanner);
+        const equipos = [
+            new Equipo("Iago"),
+            new Equipo("Kevin"),
+            new Equipo("Nahi"),
+            new Equipo("Gaby"),
+            new Equipo("Dani"),
+            new Equipo("Alex")
+        ];
 
-        System.out.println("\n¡El campeón del torneo es: " + campeon.nombre + "!");
-        scanner.close();
-    }
+        const output = document.getElementById("output");
 
-    private static void jugarRonda(List<Equipo> ganadores, List<Equipo> perdedores, Scanner scanner, String ronda) {
-        System.out.println("\n" + ronda);
-        List<Equipo> nuevosGanadores = new ArrayList<>();
-        Collections.shuffle(ganadores);
+        function mostrarMensaje(mensaje) {
+            output.innerHTML += `<p>${mensaje}</p>`;
+        }
 
-        for (int i = 0; i < ganadores.size() - 1; i += 2) {
-            Equipo e1 = ganadores.get(i);
-            Equipo e2 = ganadores.get(i + 1);
+        function jugarTorneo() {
+            let ganadores = [...equipos];
+            let perdedores = [];
 
-            System.out.println(e1.nombre + " vs " + e2.nombre);
-            System.out.print("¿Quién ganó? (" + e1.nombre + " o " + e2.nombre + "): ");
-            String ganadorNombre = scanner.nextLine().trim();
-            Equipo ganador = ganadorNombre.equalsIgnoreCase(e1.nombre) ? e1 : e2;
-            Equipo perdedor = ganador == e1 ? e2 : e1;
+            mostrarMensaje("Inicio del Torneo de Doble Eliminación");
 
-            perdedor.derrotas++;
-            nuevosGanadores.add(ganador);
-            
-            if (perdedor.derrotas < 2) {
-                perdedores.add(perdedor);
+            while (ganadores.length > 1 || perdedores.length > 1) {
+                ganadores = jugarRonda(ganadores, perdedores, "Bracket de Ganadores");
+                if (perdedores.length > 1) {
+                    perdedores = jugarRonda(perdedores, [], "Bracket de Perdedores");
+                }
             }
+
+            jugarGranFinal(ganadores[0], perdedores[0]);
         }
 
-        ganadores.clear();
-        ganadores.addAll(nuevosGanadores);
-    }
+        function jugarRonda(lista, otraLista, titulo) {
+            mostrarMensaje(`<h2>${titulo}</h2>`);
+            const nuevosGanadores = [];
 
-    private static Equipo jugarGranFinal(Equipo ganador, Equipo finalistaPerdedores, Scanner scanner) {
-        System.out.println("\nGran Final");
-        System.out.println(ganador.nombre + " vs " + finalistaPerdedores.nombre);
-        System.out.print("¿Quién ganó la final? (" + ganador.nombre + " o " + finalistaPerdedores.nombre + "): ");
-        String ganadorNombre = scanner.nextLine().trim();
-        Equipo campeon = ganadorNombre.equalsIgnoreCase(ganador.nombre) ? ganador : finalistaPerdedores;
+            for (let i = 0; i < lista.length; i += 2) {
+                if (i + 1 >= lista.length) break;
+                const e1 = lista[i];
+                const e2 = lista[i + 1];
+                const ganador = prompt(`¿Quién ganó? (${e1.nombre} o ${e2.nombre})`);
+                const equipoGanador = ganador === e1.nombre ? e1 : e2;
+                const equipoPerdedor = equipoGanador === e1 ? e2 : e1;
 
-        if (campeon == finalistaPerdedores) {
-            System.out.println("\nDesempate Final");
-            System.out.println(ganador.nombre + " vs " + finalistaPerdedores.nombre);
-            System.out.print("¿Quién ganó el desempate? (" + ganador.nombre + " o " + finalistaPerdedores.nombre + "): ");
-            ganadorNombre = scanner.nextLine().trim();
-            campeon = ganadorNombre.equalsIgnoreCase(ganador.nombre) ? ganador : finalistaPerdedores;
+                mostrarMensaje(`${e1.nombre} vs ${e2.nombre} → Ganador: ${equipoGanador.nombre}`);
+
+                equipoPerdedor.derrotas++;
+                nuevosGanadores.push(equipoGanador);
+                if (equipoPerdedor.derrotas < 2) {
+                    otraLista.push(equipoPerdedor);
+                }
+            }
+
+            return nuevosGanadores;
         }
-        return campeon;
-    }
-}
+
+        function jugarGranFinal(ganador, finalistaPerdedores) {
+            mostrarMensaje("<h2>Gran Final</h2>");
+            const finalGanador = prompt(`¿Quién ganó la final? (${ganador.nombre} o ${finalistaPerdedores.nombre})`);
+            let campeon = finalGanador === ganador.nombre ? ganador : finalistaPerdedores;
+
+            if (campeon === finalistaPerdedores) {
+                mostrarMensaje("<h3>Desempate Final</h3>");
+                const desempateGanador = prompt(`¿Quién ganó el desempate? (${ganador.nombre} o ${finalistaPerdedores.nombre})`);
+                campeon = desempateGanador === ganador.nombre ? ganador : finalistaPerdedores;
+            }
+
+            mostrarMensaje(`<h1>¡El campeón del torneo es: ${campeon.nombre}!</h1>`);
+        }
+
+        jugarTorneo();
+    </script>
+</body>
+</html>
