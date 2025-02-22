@@ -1,46 +1,90 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Torneo Doble Eliminación</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
-        .match { margin: 10px; padding: 10px; border: 1px solid black; display: inline-block; }
-    </style>
-</head>
-<body>
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Scanner;
 
-<h1>Torneo Doble Eliminación</h1>
-<div id="torneo"></div>
-<button onclick="simularTorneo()">Simular Torneo</button>
+class Equipo {
+    String nombre;
+    int derrotas = 0;
 
-<script>
-const equipos = ["Iago", "Kevin", "Nahi", "Gaby", "Dani", "Alex"];
-
-function jugarPartido(e1, e2) {
-    return Math.random() < 0.5 ? e1 : e2; 
+    Equipo(String nombre) {
+        this.nombre = nombre;
+    }
 }
 
-function simularTorneo() {
-    let ganadores = [...equipos];
-    let perdedores = [];
-    let resultados = "";
+public class TorneoDobleEliminacionManual {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        List<Equipo> equipos = new ArrayList<>();
+        equipos.add(new Equipo("Iago"));
+        equipos.add(new Equipo("Kevin"));
+        equipos.add(new Equipo("Nahi"));
+        equipos.add(new Equipo("Gaby"));
+        equipos.add(new Equipo("Dani"));
+        equipos.add(new Equipo("Alex"));
 
-    resultados += "<h2>Ronda 1</h2>";
-    for (let i = 0; i < ganadores.length; i += 2) {
-        let ganador = jugarPartido(ganadores[i], ganadores[i + 1]);
-        perdedores.push(ganadores[i] === ganador ? ganadores[i + 1] : ganadores[i]);
-        resultados += `<div class="match">${ganadores[i]} vs ${ganadores[i + 1]} → <b>${ganador}</b></div>`;
+        List<Equipo> ganadores = new ArrayList<>(equipos);
+        List<Equipo> perdedores = new ArrayList<>();
+
+        System.out.println("Inicio del Torneo de Doble Eliminación\n");
+
+        while (ganadores.size() > 1 || perdedores.size() > 1) {
+            jugarRonda(ganadores, perdedores, scanner, "Bracket de Ganadores");
+            if (!perdedores.isEmpty()) {
+                jugarRonda(perdedores, new ArrayList<>(), scanner, "Bracket de Perdedores");
+            }
+        }
+
+        // Gran final
+        Equipo finalistaGanadores = ganadores.get(0);
+        Equipo finalistaPerdedores = perdedores.get(0);
+        Equipo campeon = jugarGranFinal(finalistaGanadores, finalistaPerdedores, scanner);
+
+        System.out.println("\n¡El campeón del torneo es: " + campeon.nombre + "!");
+        scanner.close();
     }
 
-    resultados += "<h2>Final</h2>";
-    let campeon = jugarPartido(ganadores[0], perdedores[0]);
-    resultados += `<div class="match">${ganadores[0]} vs ${perdedores[0]} → <b>${campeon}</b></div>`;
+    private static void jugarRonda(List<Equipo> ganadores, List<Equipo> perdedores, Scanner scanner, String ronda) {
+        System.out.println("\n" + ronda);
+        List<Equipo> nuevosGanadores = new ArrayList<>();
+        Collections.shuffle(ganadores);
 
-    document.getElementById("torneo").innerHTML = resultados;
+        for (int i = 0; i < ganadores.size() - 1; i += 2) {
+            Equipo e1 = ganadores.get(i);
+            Equipo e2 = ganadores.get(i + 1);
+
+            System.out.println(e1.nombre + " vs " + e2.nombre);
+            System.out.print("¿Quién ganó? (" + e1.nombre + " o " + e2.nombre + "): ");
+            String ganadorNombre = scanner.nextLine().trim();
+            Equipo ganador = ganadorNombre.equalsIgnoreCase(e1.nombre) ? e1 : e2;
+            Equipo perdedor = ganador == e1 ? e2 : e1;
+
+            perdedor.derrotas++;
+            nuevosGanadores.add(ganador);
+            
+            if (perdedor.derrotas < 2) {
+                perdedores.add(perdedor);
+            }
+        }
+
+        ganadores.clear();
+        ganadores.addAll(nuevosGanadores);
+    }
+
+    private static Equipo jugarGranFinal(Equipo ganador, Equipo finalistaPerdedores, Scanner scanner) {
+        System.out.println("\nGran Final");
+        System.out.println(ganador.nombre + " vs " + finalistaPerdedores.nombre);
+        System.out.print("¿Quién ganó la final? (" + ganador.nombre + " o " + finalistaPerdedores.nombre + "): ");
+        String ganadorNombre = scanner.nextLine().trim();
+        Equipo campeon = ganadorNombre.equalsIgnoreCase(ganador.nombre) ? ganador : finalistaPerdedores;
+
+        if (campeon == finalistaPerdedores) {
+            System.out.println("\nDesempate Final");
+            System.out.println(ganador.nombre + " vs " + finalistaPerdedores.nombre);
+            System.out.print("¿Quién ganó el desempate? (" + ganador.nombre + " o " + finalistaPerdedores.nombre + "): ");
+            ganadorNombre = scanner.nextLine().trim();
+            campeon = ganadorNombre.equalsIgnoreCase(ganador.nombre) ? ganador : finalistaPerdedores;
+        }
+        return campeon;
+    }
 }
-</script>
-
-</body>
-</html>
