@@ -8,11 +8,13 @@
         body { font-family: Arial, sans-serif; margin: 20px; }
         h1 { text-align: center; }
         .match { margin: 10px 0; }
+        .winner-btn { margin: 5px; padding: 10px; cursor: pointer; }
     </style>
 </head>
 <body>
     <h1>Torneo de Doble Eliminación</h1>
     <div id="output"></div>
+
     <script>
         class Equipo {
             constructor(nombre) {
@@ -31,63 +33,70 @@
         ];
 
         const output = document.getElementById("output");
+        let ganadores = [...equipos];
+        let perdedores = [];
+        let rondaActual = 1;
+        let finalistas = {};
 
         function mostrarMensaje(mensaje) {
             output.innerHTML += `<p>${mensaje}</p>`;
         }
 
         function jugarTorneo() {
-            let ganadores = [...equipos];
-            let perdedores = [];
-
-            mostrarMensaje("Inicio del Torneo de Doble Eliminación");
-
-            while (ganadores.length > 1 || perdedores.length > 1) {
-                ganadores = jugarRonda(ganadores, perdedores, "Bracket de Ganadores");
-                if (perdedores.length > 1) {
-                    perdedores = jugarRonda(perdedores, [], "Bracket de Perdedores");
-                }
-            }
-
-            jugarGranFinal(ganadores[0], perdedores[0]);
+            mostrarMensaje("<h2>Ronda 1: Bracket de Ganadores</h2>");
+            mostrarPartidos(ganadores, perdedores, "Bracket de Ganadores");
         }
 
-        function jugarRonda(lista, otraLista, titulo) {
-            mostrarMensaje(`<h2>${titulo}</h2>`);
-            const nuevosGanadores = [];
-
+        function mostrarPartidos(lista, otraLista, titulo) {
+            output.innerHTML = `<h2>${titulo}</h2>`;
             for (let i = 0; i < lista.length; i += 2) {
                 if (i + 1 >= lista.length) break;
                 const e1 = lista[i];
                 const e2 = lista[i + 1];
-                const ganador = prompt(`¿Quién ganó? (${e1.nombre} o ${e2.nombre})`);
-                const equipoGanador = ganador === e1.nombre ? e1 : e2;
-                const equipoPerdedor = equipoGanador === e1 ? e2 : e1;
 
-                mostrarMensaje(`${e1.nombre} vs ${e2.nombre} → Ganador: ${equipoGanador.nombre}`);
-
-                equipoPerdedor.derrotas++;
-                nuevosGanadores.push(equipoGanador);
-                if (equipoPerdedor.derrotas < 2) {
-                    otraLista.push(equipoPerdedor);
-                }
+                output.innerHTML += `
+                    <div class="match">
+                        <p>${e1.nombre} vs ${e2.nombre}</p>
+                        <button class="winner-btn" onclick="registrarGanador('${e1.nombre}', '${e2.nombre}')">Gana ${e1.nombre}</button>
+                        <button class="winner-btn" onclick="registrarGanador('${e2.nombre}', '${e1.nombre}')">Gana ${e2.nombre}</button>
+                    </div>
+                `;
             }
+        }
 
-            return nuevosGanadores;
+        function registrarGanador(ganadorNombre, perdedorNombre) {
+            const ganador = equipos.find(e => e.nombre === ganadorNombre);
+            const perdedor = equipos.find(e => e.nombre === perdedorNombre);
+            
+            perdedor.derrotas++;
+            if (perdedor.derrotas < 2) {
+                perdedores.push(perdedor);
+            }
+            
+            ganadores = ganadores.filter(e => e.nombre !== perdedor.nombre);
+
+            if (ganadores.length === 1 && perdedores.length === 1) {
+                jugarGranFinal(ganadores[0], perdedores[0]);
+            } else if (ganadores.length > 1) {
+                mostrarPartidos(ganadores, perdedores, "Bracket de Ganadores");
+            } else {
+                mostrarPartidos(perdedores, [], "Bracket de Perdedores");
+            }
         }
 
         function jugarGranFinal(ganador, finalistaPerdedores) {
-            mostrarMensaje("<h2>Gran Final</h2>");
-            const finalGanador = prompt(`¿Quién ganó la final? (${ganador.nombre} o ${finalistaPerdedores.nombre})`);
-            let campeon = finalGanador === ganador.nombre ? ganador : finalistaPerdedores;
+            output.innerHTML = "<h2>Gran Final</h2>";
+            output.innerHTML += `
+                <div class="match">
+                    <p>${ganador.nombre} vs ${finalistaPerdedores.nombre}</p>
+                    <button class="winner-btn" onclick="terminarTorneo('${ganador.nombre}')">Gana ${ganador.nombre}</button>
+                    <button class="winner-btn" onclick="terminarTorneo('${finalistaPerdedores.nombre}')">Gana ${finalistaPerdedores.nombre}</button>
+                </div>
+            `;
+        }
 
-            if (campeon === finalistaPerdedores) {
-                mostrarMensaje("<h3>Desempate Final</h3>");
-                const desempateGanador = prompt(`¿Quién ganó el desempate? (${ganador.nombre} o ${finalistaPerdedores.nombre})`);
-                campeon = desempateGanador === ganador.nombre ? ganador : finalistaPerdedores;
-            }
-
-            mostrarMensaje(`<h1>¡El campeón del torneo es: ${campeon.nombre}!</h1>`);
+        function terminarTorneo(campeonNombre) {
+            output.innerHTML = `<h1>¡El campeón del torneo es: ${campeonNombre}!</h1>`;
         }
 
         jugarTorneo();
