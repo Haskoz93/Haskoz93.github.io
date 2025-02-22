@@ -1,48 +1,46 @@
 <!DOCTYPE html>
-<html lang="esp">
-	<head>
-		<title>Blog de Dragon Ball</title>
-		<link href="style.css" rel="stylesheet">
-	</head>
-	<body>
-		<main>
-			<h1>Lista de entradas</h1>
-			<ul>
-				<a href="#SSJ1">
-					<li>Super Saiyajin</li>
-				</a>
-				<a href="#SSJ2">
-					<li>Super Saiyajin 2</li>
-				</a>
-				<a href="#SSJ3">
-					<li>Super Saiyajin 3</li>
-				</a>
-			</ul>
-		
-			<h2>Transformaciones de los Saiyajines</h2>
-				
-			<article id="SSJ1" class="Transformaciones">
-				<a class="block" href="#SSJ1" target="_blank">
-					<h2>Super Saiyajin 1</h2>
-				</a>
-				<img src="https://cdn.hobbyconsolas.com/sites/navi.axelspringer.es/public/media/image/2017/10/transformaciones-saiyans_2.jpg?tf=640x" alt="Goku en Super Saiyajin">						<p>La primera transformación de un Saiyajin, considerado el nivel 1.</p>
-				</article>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Torneo Doble Eliminación</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        .match { margin: 10px; padding: 10px; border: 1px solid black; display: inline-block; }
+    </style>
+</head>
+<body>
 
-			<article id="SSJ2" class="Transformaciones">
-				<a class="block" href="mylink">
-					<h2>Super Saiyajin 2</h2>
-				</a>
-				<img src="https://cdn.hobbyconsolas.com/sites/navi.axelspringer.es/public/media/image/2017/10/transformaciones-saiyans_7.jpg?tf=640x" alt="Gohan en Super Saiyajin 2">
-				<p>La segunda transformación de un Saiyajin, considerada el nivel 2</p>
-			</article>
-		
-			<article id="SSJ3" class="Transformaciones">
-				<a class="block" href="mylink">
-					<h2>Super Saiyajin 3</h2>
-				</a>
-				<img src="https://cdn.hobbyconsolas.com/sites/navi.axelspringer.es/public/media/image/2017/10/transformaciones-saiyans_8.jpg?tf=640x" alt="Goku en Super Saiyajin 3">
-				<p>La tercera transformación de un Saiyajin, la última en el CANON de Dragon Ball Z</p>
-			</article>
-			
-		</main>
-	</body>
+<h1>Torneo Doble Eliminación</h1>
+<div id="torneo"></div>
+<button onclick="simularTorneo()">Simular Torneo</button>
+
+<script>
+const equipos = ["Iago", "Kevin", "Nahi", "Gaby", "Dani", "Alex"];
+
+function jugarPartido(e1, e2) {
+    return Math.random() < 0.5 ? e1 : e2; 
+}
+
+function simularTorneo() {
+    let ganadores = [...equipos];
+    let perdedores = [];
+    let resultados = "";
+
+    resultados += "<h2>Ronda 1</h2>";
+    for (let i = 0; i < ganadores.length; i += 2) {
+        let ganador = jugarPartido(ganadores[i], ganadores[i + 1]);
+        perdedores.push(ganadores[i] === ganador ? ganadores[i + 1] : ganadores[i]);
+        resultados += `<div class="match">${ganadores[i]} vs ${ganadores[i + 1]} → <b>${ganador}</b></div>`;
+    }
+
+    resultados += "<h2>Final</h2>";
+    let campeon = jugarPartido(ganadores[0], perdedores[0]);
+    resultados += `<div class="match">${ganadores[0]} vs ${perdedores[0]} → <b>${campeon}</b></div>`;
+
+    document.getElementById("torneo").innerHTML = resultados;
+}
+</script>
+
+</body>
+</html>
