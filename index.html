@@ -3,103 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Torneo Doble Eliminación</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h1 { text-align: center; }
-        .match { margin: 10px 0; }
-        .winner-btn { margin: 5px; padding: 10px; cursor: pointer; }
-    </style>
+    <title>Torneo de Doble Eliminación</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Torneo de Doble Eliminación</h1>
-    <div id="output"></div>
-
-    <script>
-        class Equipo {
-            constructor(nombre) {
-                this.nombre = nombre;
-                this.derrotas = 0;
-            }
-        }
-
-        const equipos = [
-            new Equipo("Iago"),
-            new Equipo("Kevin"),
-            new Equipo("Nahi"),
-            new Equipo("Gaby"),
-            new Equipo("Dani"),
-            new Equipo("Alex")
-        ];
-
-        const output = document.getElementById("output");
-        let ganadores = [...equipos];
-        let perdedores = [];
-        let rondaActual = 1;
-        let finalistas = {};
-
-        function mostrarMensaje(mensaje) {
-            output.innerHTML += `<p>${mensaje}</p>`;
-        }
-
-        function jugarTorneo() {
-            mostrarMensaje("<h2>Ronda 1: Bracket de Ganadores</h2>");
-            mostrarPartidos(ganadores, perdedores, "Bracket de Ganadores");
-        }
-
-        function mostrarPartidos(lista, otraLista, titulo) {
-            output.innerHTML = `<h2>${titulo}</h2>`;
-            for (let i = 0; i < lista.length; i += 2) {
-                if (i + 1 >= lista.length) break;
-                const e1 = lista[i];
-                const e2 = lista[i + 1];
-
-                output.innerHTML += `
-                    <div class="match">
-                        <p>${e1.nombre} vs ${e2.nombre}</p>
-                        <button class="winner-btn" onclick="registrarGanador('${e1.nombre}', '${e2.nombre}')">Gana ${e1.nombre}</button>
-                        <button class="winner-btn" onclick="registrarGanador('${e2.nombre}', '${e1.nombre}')">Gana ${e2.nombre}</button>
-                    </div>
-                `;
-            }
-        }
-
-        function registrarGanador(ganadorNombre, perdedorNombre) {
-            const ganador = equipos.find(e => e.nombre === ganadorNombre);
-            const perdedor = equipos.find(e => e.nombre === perdedorNombre);
-            
-            perdedor.derrotas++;
-            if (perdedor.derrotas < 2) {
-                perdedores.push(perdedor);
-            }
-            
-            ganadores = ganadores.filter(e => e.nombre !== perdedor.nombre);
-
-            if (ganadores.length === 1 && perdedores.length === 1) {
-                jugarGranFinal(ganadores[0], perdedores[0]);
-            } else if (ganadores.length > 1) {
-                mostrarPartidos(ganadores, perdedores, "Bracket de Ganadores");
-            } else {
-                mostrarPartidos(perdedores, [], "Bracket de Perdedores");
-            }
-        }
-
-        function jugarGranFinal(ganador, finalistaPerdedores) {
-            output.innerHTML = "<h2>Gran Final</h2>";
-            output.innerHTML += `
-                <div class="match">
-                    <p>${ganador.nombre} vs ${finalistaPerdedores.nombre}</p>
-                    <button class="winner-btn" onclick="terminarTorneo('${ganador.nombre}')">Gana ${ganador.nombre}</button>
-                    <button class="winner-btn" onclick="terminarTorneo('${finalistaPerdedores.nombre}')">Gana ${finalistaPerdedores.nombre}</button>
-                </div>
-            `;
-        }
-
-        function terminarTorneo(campeonNombre) {
-            output.innerHTML = `<h1>¡El campeón del torneo es: ${campeonNombre}!</h1>`;
-        }
-
-        jugarTorneo();
-    </script>
+    <div class="container">
+        <h1>Torneo de Doble Eliminación</h1>
+        <div id="input-section">
+            <h2>Ingresa los nombres de los participantes:</h2>
+            <input type="text" id="p1" placeholder="Participante 1">
+            <input type="text" id="p2" placeholder="Participante 2">
+            <input type="text" id="p3" placeholder="Participante 3">
+            <input type="text" id="p4" placeholder="Participante 4">
+            <input type="text" id="p5" placeholder="Participante 5">
+            <input type="text" id="p6" placeholder="Participante 6">
+            <button onclick="iniciarTorneo()">Iniciar Torneo</button>
+        </div>
+        <div id="torneo-section" style="display: none;">
+            <h2>Enfrentamientos</h2>
+            <div id="enfrentamientos"></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
 </body>
 </html>
