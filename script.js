@@ -1,64 +1,44 @@
-let participantes = [];
-let enfrentamientos = [];
-let resultados = {};
-
-function iniciarTorneo() {
-    participantes = [
-        document.getElementById('p1').value || 'P1',
-        document.getElementById('p2').value || 'P2',
-        document.getElementById('p3').value || 'P3',
-        document.getElementById('p4').value || 'P4',
-        document.getElementById('p5').value || 'P5',
-        document.getElementById('p6').value || 'P6'
-    ];
-
-    document.getElementById('input-section').style.display = 'none';
-    document.getElementById('torneo-section').style.display = 'block';
-
-    enfrentamientos = [
-        { id: 1, participantes: [participantes[1], participantes[2]] },
-        { id: 2, participantes: [participantes[3], participantes[4]] }
-    ];
-
-    mostrarEnfrentamientos();
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
-function mostrarEnfrentamientos() {
-    const enfrentamientosDiv = document.getElementById('enfrentamientos');
-    enfrentamientosDiv.innerHTML = '';
-
-    enfrentamientos.forEach(enfrentamiento => {
-        const enfrentamientoDiv = document.createElement('div');
-        enfrentamientoDiv.innerHTML = `
-            <p>Enfrentamiento ${enfrentamiento.id}: ${enfrentamiento.participantes[0]} vs ${enfrentamiento.participantes[1]}</p>
-            <select id="resultado${enfrentamiento.id}">
-                <option value="0">${enfrentamiento.participantes[0]}</option>
-                <option value="1">${enfrentamiento.participantes[1]}</option>
-            </select>
-            <button onclick="registrarResultado(${enfrentamiento.id})">Registrar Resultado</button>
-        `;
-        enfrentamientosDiv.appendChild(enfrentamientoDiv);
-    });
+.container {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    text-align: center;
 }
 
-function registrarResultado(id) {
-    const resultado = document.getElementById(`resultado${id}`).value;
-    resultados[id] = enfrentamientos.find(e => e.id === id).participantes[resultado];
-
-    if (Object.keys(resultados).length === 2) {
-        avanzarRonda();
-    }
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
-function avanzarRonda() {
-    const ganador1 = resultados[1];
-    const ganador2 = resultados[2];
+button {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
 
-    enfrentamientos = [
-        { id: 3, participantes: [participantes[0], ganador1] },
-        { id: 4, participantes: [participantes[5], ganador2] }
-    ];
+button:hover {
+    background-color: #218838;
+}
 
-    resultados = {};
-    mostrarEnfrentamientos();
+#torneo-section {
+    margin-top: 20px;
 }
